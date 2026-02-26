@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pterodactyl WhatsApp Bot Deployer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102,126,234,0.3);
+        }
+        
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .result {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        
+        .pairing-code {
+            font-family: monospace;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            margin: 15px 0;
+            letter-spacing: 2px;
+        }
+        
+        .credentials {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            word-break: break-all;
+        }
+        
+        .step {
+            display: flex;
+            margin-bottom: 15px;
+            align-items: flex-start;
+        }
+        
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        
+        .step-text {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Pterodactyl Bot Deployer</h1>
+        <div class="subtitle">Deploy WhatsApp bots with just your phone number</div>
+        
+        <form id="deployForm">
+            <div class="form-group">
+                <label>📱 Phone Number (with country code)</label>
+                <input type="tel" id="phoneNumber" placeholder="e.g., 1234567890" required>
+            </div>
+            
+            <div class="form-group">
+                <label>📧 Email (optional)</label>
+                <input type="email" id="email" placeholder="your@email.com">
+            </div>
+            
+            <button type="submit" id="deployBtn">Deploy Bot</button>
+        </form>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Deploying your bot... This may take a moment.</p>
+        </div>
+        
+        <div class="result" id="result"></div>
+        
+        <div class="info-box">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-text">Enter your phone number</div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-text">Bot deploys to Pterodactyl</div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-text">Get pairing code or login credentials</div>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-text">Link WhatsApp and start using</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('deployForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const email = document.getElementById('email').value;
+            
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('deployBtn').disabled = true;
+            document.getElementById('result').style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/deploy', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phoneNumber, email })
+                });
+                
+                const data = await response.json();
+                
+                document.getElementById('loading').style.display = 'none';
+                const resultDiv = document.getElementById('result');
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    
+                    let html = '<h3>✅ Deployment Successful!</h3>';
+                    
+                    if (data.pairingCode) {
+                        html += `
+                            <div class="pairing-code">${data.pairingCode}</div>
+                            <p>Enter this code in WhatsApp to link your bot</p>
+                        `;
+                    }
+                    
+                    html += `
+                        <div class="credentials">
+                            <p><strong>Panel URL:</strong> <a href="${data.panelUrl}" target="_blank">${data.panelUrl}</a></p>
+                            <p><strong>Username:</strong> ${data.username}</p>
+                            <p><strong>Password:</strong> ${data.password}</p>
+                        </div>
+                        <div style="text-align: left;">
+                            <h4>📋 Next Steps:</h4>
+                            <ol style="margin-left: 20px;">
+                                <li>Login to Pterodactyl panel</li>
+                                <li>Start your server</li>
+                                <li>Check console for QR/pairing</li>
+                                <li>Link WhatsApp and enjoy!</li>
+                            </ol>
+                        </div>
+                    `;
+                    
+                    resultDiv.innerHTML = html;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `<h3>❌ Deployment Failed</h3><p>${data.error}</p>`;
+                }
+                
+                resultDiv.style.display = 'block';
+                
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                const resultDiv = document.getElementById('result');
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<h3>❌ Error</h3><p>${error.message}</p>`;
+                resultDiv.style.display = 'block';
+            } finally {
+                document.getElementById('deployBtn').disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
